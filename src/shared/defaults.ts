@@ -14,6 +14,19 @@ export function createDocument(): StudioDocument {
       background: "#101216",
     },
     grid: null,
+    braille: {
+      settings: {
+        dotColumns: 96,
+        mode: "gray",
+        threshold: 0.5,
+        invert: false,
+        color: true,
+        paper: "A4",
+        dotPitch: 2.5,
+      },
+      edits: [],
+      matrix: null,
+    },
     revision: 0,
   };
 }

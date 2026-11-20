@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { Asterisk, LockKeyhole, ArrowUpRight } from "lucide-vue-next";
+import { ref } from "vue";
+import { Asterisk, LockKeyhole, ArrowUpRight, Type, Grip } from "lucide-vue-next";
 import { useWorkspace } from "./useWorkspace";
 import { SourcePanel } from "../features/source";
 import { CropPanel } from "../features/crop";
 import { MappingPanel } from "../features/mapping";
 import { PreviewPanel } from "../features/preview";
 import { ExportPanel } from "../features/export";
+import { BraillePanel, BrailleStage, BrailleExport } from "../features/braille";
 const w = useWorkspace();
+const mode = ref<"ascii" | "braille">("ascii");
 </script>
 <template>
   <div class="app">
@@ -32,9 +35,30 @@ const w = useWorkspace();
         . : - = + * # % @<small>PIXELS → CHARACTERS → ART</small>
       </div>
     </div>
+    <div class="mode-bar">
+      <div class="tabs">
+        <button :class="{ active: mode === 'ascii' }" @click="mode = 'ascii'">
+          <Type :size="14" /> 字符 ASCII</button
+        ><button :class="{ active: mode === 'braille' }" @click="mode = 'braille'">
+          <Grip :size="14" /> 盲文点阵制版
+        </button>
+      </div>
+      <small>{{
+        mode === "ascii"
+          ? "像素 → 字符 → 艺术"
+          : "真实点位 · 逐点修整 · 屏幕与凸点印刷双预览"
+      }}</small>
+    </div>
     <div class="editor">
-      <aside><SourcePanel /><CropPanel /><MappingPanel /></aside>
-      <div class="result"><PreviewPanel /><ExportPanel /></div>
+      <aside>
+        <SourcePanel /><CropPanel />
+        <MappingPanel v-if="mode === 'ascii'" />
+        <BraillePanel v-else />
+      </aside>
+      <div class="result">
+        <template v-if="mode === 'ascii'"><PreviewPanel /><ExportPanel /></template>
+        <template v-else><BrailleStage /><BrailleExport /></template>
+      </div>
     </div>
     <footer>
       <span role="status">{{ w.notice.value }}</span
